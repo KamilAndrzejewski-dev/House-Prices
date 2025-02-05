@@ -103,12 +103,18 @@ class TestCore:
         assert result is None
 
 
-    def test_load_and_validate_config(self, valid_config):
-
+    def test_load_and_validate_valid_config(self, valid_config):
         config = load_and_validate_config(config_yaml=valid_config)
 
         assert isinstance(config.config_app, AppConfig)
         assert isinstance(config.config_model, ModelConfig)
         assert config.config_app.model == 'test_model'
         assert config.config_model.alpha == 0.5
+
+    def test_load_and_validate_invalid_config(self, invalid_config):
+        with pytest.raises(ValidationError):
+            load_and_validate_config(config_yaml=invalid_config)
+
+
+
 
