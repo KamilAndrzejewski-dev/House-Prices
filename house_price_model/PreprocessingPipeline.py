@@ -37,7 +37,7 @@ preprocessing_pipeline = Pipeline(
             ),
         ),
         (
-            'binazer', F.CustomBinarizer(
+            'binarizer', F.CustomBinarizer(
                 variables=_config.config_model.binarize_transformation_variables,
                 threshold=0
             ),

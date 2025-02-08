@@ -3,10 +3,9 @@ import pandas as pd
 from house_price_model.Preprocessing.validation import drop_missing_values, validate_data
 from house_price_model.Preprocessing.data_manager import load_pipeline
 from house_price_model.Config.core import _config, TRAINED_MODEL_DIR
+from house_price_model.Preprocessing.data_manager import load_datasets
 from house_price_model import __version__
 from typing import Union, Dict
-from house_price_model.Preprocessing.data_manager import load_datasets
-from house_price_model.PreprocessingPipeline import preprocessing_pipeline
 
 pd.set_option('display.max_columns', None)
 
@@ -27,14 +26,14 @@ def predict(*, input_data: Union[pd.DataFrame, dict]) -> Dict:
             Dict: Returns dictionary with predictions, errors and version.
 
     """
-    dataframe = pd.DataFrame(input_data)
-    validated_data, errors = validate_data(dataframe)
+    if not isinstance(input_data, pd.DataFrame):
+        raise TypeError("Input must be a Dataframe")
+
+    validated_data, errors = validate_data(input_data)
     validated_data = drop_missing_values(validated_data)
     validated_data = validated_data[_config.config_model.features]
 
     transformed_data = transformer_pipe.transform(validated_data)
-
-    results = {"prediction": [], "errors": errors, "version": __version__}
 
     y_pred = model_pipe.predict(transformed_data)
 
@@ -46,10 +45,6 @@ def predict(*, input_data: Union[pd.DataFrame, dict]) -> Dict:
 
     return results
 
+
 if __name__ == "__main__":
-    results = predict(input_data=load_datasets(mode='test'))
-    print(results['prediction'])
-
-
-
-
+    results = predict(input_data=load_datasets(mode='train'))

@@ -358,13 +358,14 @@ class MonotonicOrdinalEncoder(BaseEstimator, TransformerMixin):
         """
 
 
-        dataframe = X.copy()
+        dataframe = pd.concat([X, y], axis=1)
         sorted_variables = None
         for col in self.variables_:
             if col in dataframe.columns:
-                if self.method_ == 'mean':
-                    aggredated = dataframe.groupby([col])[y.name].mean()
-                    sorted_variables = aggredated.sort_values(ascending=True)
+                if self.method_ == 'mean' and col != 'SalePrice':
+                    sorted_variables = (
+                        dataframe.groupby([col])[y.name].mean().sort_values(ascending=True)
+                    )
                 elif self.method_ == 'median' and col != 'SalePrice':
                     sorted_variables = (
                         dataframe.groupby([col])[y.name].median().sort_values(ascending=True)
@@ -380,7 +381,6 @@ class MonotonicOrdinalEncoder(BaseEstimator, TransformerMixin):
 
         Args:
             X (pd.DataFrame): Pandas DataFrame.
-
 
         Returns:
             DataFrame: Returns DataFrame with mapped variables.
